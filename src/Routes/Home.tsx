@@ -3,13 +3,14 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import getMovies, { IGetMoviesResult } from "../api";
+import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
 
 const Wrapper = styled.div`
   background: black;
   overflow-x: hidden;
   padding-bottom: 200px;
+  height: 200vh;
 `;
 
 const Loader = styled.div`
@@ -135,18 +136,16 @@ const rowVariants = {
     x: -window.outerWidth - 10,
   },
 };
-
 const boxVariants = {
   normal: {
     scale: 1,
   },
-
   hover: {
     scale: 1.3,
-    y: -50,
+    y: -80,
     transition: {
-      delay: 1,
-      duration: 0.5,
+      delay: 0.5,
+      duaration: 0.1,
       type: "tween",
     },
   },

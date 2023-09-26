@@ -18,8 +18,14 @@ export interface IGetMoviesResult {
   total_pages: number;
   total_results: number;
 }
-export default function getMovies() {
+export function getMovies() {
   return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
     (response) => response.json()
   );
+}
+
+export function searchMovies(value: String) {
+  return fetch(
+    `${BASE_PATH}/search/movie?query=${value}&api_key=${API_KEY}`
+  ).then((response) => response.json());
 }
