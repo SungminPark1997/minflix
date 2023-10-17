@@ -122,15 +122,17 @@ function Slide({ data }: SliderProps) {
   const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:id");
   console.log(condition);
   console.log(index);
-
+  const arr = data?.results.slice(1).filter((movie) => movie.backdrop_path);
+  const totalMovies = arr.length - 1;
+  console.log(totalMovies);
   const [isFinish, setFinish] = useState(false);
 
   const increaseIndex = (newDirection: number) => {
-    if (data) {
+    if (arr) {
       if (isFinish) return;
       setDirection(newDirection);
       toggleLeaving();
-      const totalMovies = data.results.length - 1;
+
       const maxIndex = Math.floor(totalMovies / offset) - 1;
 
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
@@ -139,11 +141,11 @@ function Slide({ data }: SliderProps) {
   };
 
   const decreaseIndex = (newDirection: number) => {
-    if (data) {
+    if (arr) {
       if (isFinish) return;
       setDirection(newDirection);
       toggleLeaving();
-      const totalMovies = data.results.length - 1;
+
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
       setCondition("left");
@@ -172,27 +174,24 @@ function Slide({ data }: SliderProps) {
           transition={{ type: "tween", duration: 1 }}
           key={index}
         >
-          {data?.results
-            .slice(1)
-            .slice(offset * index, offset * index + offset)
-            .map((movie) =>
-              movie.backdrop_path ? (
-                <Box
-                  layoutId={movie.id + ""}
-                  variants={boxVariants}
-                  whileHover="hover"
-                  initial="normal"
-                  key={movie.id}
-                  onClick={() => onBoxClicked(movie.id)}
-                  transition={{ type: "tween" }}
-                  bgphoto={makeImagePath(movie.backdrop_path, "w500")}
-                >
-                  <Info variants={infoVariants}>
-                    <h4>{movie.title}</h4>
-                  </Info>
-                </Box>
-              ) : null
-            )}
+          {arr.slice(offset * index, offset * index + offset).map((movie) =>
+            movie.backdrop_path ? (
+              <Box
+                layoutId={movie.id + ""}
+                variants={boxVariants}
+                whileHover="hover"
+                initial="normal"
+                key={movie.id}
+                onClick={() => onBoxClicked(movie.id)}
+                transition={{ type: "tween" }}
+                bgphoto={makeImagePath(movie.backdrop_path, "w500")}
+              >
+                <Info variants={infoVariants}>
+                  <h4>{movie.title}</h4>
+                </Info>
+              </Box>
+            ) : null
+          )}
         </Row>
         <RightStyledIcon
           key="right-icon"
