@@ -6,7 +6,7 @@ import {
 } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, Navigate, useMatch, useNavigate } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const Nav = styled(motion.nav)`
@@ -125,7 +125,8 @@ function Header() {
   const navigate = useNavigate();
 
   const onValid = (data: IForm) => {
-    navigate("/search", { state: { value: data } });
+    console.log("hi this is onValid");
+    navigate(`/search?${data.keyword} `, { state: { value: data } });
   };
   const onClick = () => {
     navigate("/");

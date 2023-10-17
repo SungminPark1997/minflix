@@ -1,7 +1,10 @@
+import { color } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import { styled } from "styled-components";
 import { IGetMoviesResult, searchMovies } from "../api";
+import Slide from "../Components/Slide";
 import { makeImagePath } from "../utils";
 const Wrapper = styled.div`
   overflow-x: hidden;
@@ -16,35 +19,55 @@ const Loader = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const Banner = styled.div<{ bgphoto: string }>`
+const Banner = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgphoto});
-  background-size: cover;
+`;
+
+const CannotFind = styled.div`
+  color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  margin-top: 20%;
+  justify-content: center;
+`;
+const Result = styled.div<{ bgphoto: string }>`
+margin-left: 25%;
+width:50%;
+height: 70%;
+background-size: cover;
+ display:flex
+ justify-content: center;
+ background-position: center center;
+ background-image:url(${(props) => props.bgphoto});
+
 `;
 function Search() {
   const location = useLocation();
   const { keyword } = location.state.value;
 
   const { data, isLoading, isError } = useQuery<IGetMoviesResult>(
-    ["movies", "search"],
+    ["movies", "search", keyword],
     () => searchMovies(keyword)
   );
   console.log(data);
 
-  console.log(isError);
   return (
     <Wrapper>
       {isLoading ? (
         <Loader>Loading</Loader>
       ) : !data || data?.results.length === 0 ? (
-        <div>찾는 내용 없음</div>
+        <CannotFind>
+          입력하신 검색어{keyword}와 일치하는 결과가 없습니다.
+        </CannotFind>
       ) : (
-        <Banner bgphoto={makeImagePath(data.results[0].backdrop_path)}></Banner>
+        <Banner>
+          <Slide data={data}></Slide>
+        </Banner>
       )}
     </Wrapper>
   );
