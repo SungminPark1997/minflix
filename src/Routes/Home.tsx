@@ -1,72 +1,60 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getMovies, IGetMoviesResult } from "../api";
+import { getMovies, IGetMoviesResult, trendMovies } from "../api";
 import Slide from "../Components/Slide";
-import TopMovie from "../Components/Slide";
 import { makeImagePath } from "../utils";
-
-const Wrapper = styled.div`
-  background: black;
+export const Wrapper = styled.div`
+  background: rgb(8%, 8%, 8%);
   overflow-x: hidden;
   padding-bottom: 200px;
-  height: 200vh;
 `;
 
-const Loader = styled.div`
+export const Loader = styled.div`
   height: 20vh;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgphoto: string }>`
+export const Banner = styled.div<{ bgphoto: string }>`
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+
+  background-image: linear-gradient(rgba(8%, 8%, 8%, 0), rgba(8%, 8%, 8%, 1)),
     url(${(props) => props.bgphoto});
   background-size: cover;
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-size: 50px;
   width: 50%;
-
   color: white;
 `;
-const Overview = styled.p`
+export const Overview = styled.p`
   font-size: 36px;
 `;
 
-const Slider = styled.div`
+export const Content = styled.div`
   position: relative;
-  top: -300px;
-`; //
+  width: 100%;
+  height: 100vh;
+`;
 
-const Row = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
+export const Overlay = styled(motion.div)`
   position: absolute;
   width: 100%;
-`; //
-
-const Overlay = styled(motion.div)`
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  height: 200vh;
   background-color: rgba(0, 0, 0, 0.5);
   top: 0;
   opacity: 0;
 `;
-const BigMoive = styled(motion.div)`
+export const BigMoive = styled(motion.div)`
   position: fixed;
   zindex: 3;
   width: 40vw;
@@ -80,7 +68,7 @@ const BigMoive = styled(motion.div)`
   overflow: hidden;
   background-color: ${(props) => props.theme.black.lighter};
 `;
-const BigPhoto = styled.div<{ bgphoto: string }>`
+export const BigPhoto = styled.div<{ bgphoto: string }>`
   background-size: cover;
   width: 100%;
   background-position: center center;
@@ -89,89 +77,107 @@ const BigPhoto = styled.div<{ bgphoto: string }>`
     url(${(props) => props.bgphoto});
 `;
 
-const BigTitle = styled.div`
+export const BigTitle = styled.div`
   color: ${(props) => props.theme.white.lighter};
   padding: 20px;
   font-size: 46px;
   position: relative;
   top: -80px;
 `;
-const BigOverview = styled.p`
+export const BigOverview = styled.p`
   padding: 20px;
   position: relative;
   top: -80px;
   color: ${(props) => props.theme.white.lighter};
 `;
-/*const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 10,
-  },
-  visible: {
-    x: 0,
-  },
-  exitRight: {
-    // 오른쪽 방향 exit 애니메이션
-    x: -window.outerWidth - 10,
-  },
-  exitLeft: {
-    // 왼쪽 방향 exit 애니메이션
-    x: window.outerWidth + 10,
-  },
-};*/
+export const NowPlayingLine = styled.div`
+  position: absolute;
+  top: -335px;
 
+  z-index: 1; /* Slide 컴포넌트의 아래에 위치하도록 z-index 설정 */
+  color: white;
+  font-size: 24px;
+`;
+export const TrendingLine = styled.div`
+  position: absolute;
+  top: -35px;
+
+  z-index: 1; /* Slide 컴포넌트의 아래에 위치하도록 z-index 설정 */
+  color: white;
+  font-size: 24px;
+`;
 function Home() {
   const navigate = useNavigate();
+  const matchInfo = useMatch("/movies/:movieId/:top");
 
-  const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:id");
+  const { data: now_playing, isLoading: isLoadingNowPlaying } =
+    useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies);
 
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
+  const { data: trending, isLoading } = useQuery<IGetMoviesResult>(
+    ["movies", "trending"],
+    trendMovies
   );
-
+  const arr = [
+    ...Object.values(now_playing?.results || {}),
+    ...Object.values(trending?.results || {}),
+  ];
   const clickedMovie =
-    bigMovieMatch?.params.id &&
-    data?.results.find((movie) => movie.id + "" === bigMovieMatch?.params.id);
+    matchInfo?.params.movieId &&
+    arr.find((movie) => movie.id + "" === matchInfo?.params.movieId);
 
   const onOverlayClick = () => {
     navigate("/");
   };
 
-  console.log(data, isLoading);
   return (
     <Wrapper>
-      {isLoading ? (
+      {isLoadingNowPlaying && isLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-            <Title>{data?.results[0].title}</Title>
-            <Overview>{data?.results[0].overview}</Overview>
+          <Banner
+            bgphoto={makeImagePath(now_playing?.results[0].backdrop_path || "")}
+          >
+            <Title>{now_playing?.results[0].title}</Title>
+            <Overview>{now_playing?.results[0].overview}</Overview>
           </Banner>
 
-          {data ? <Slide data={data} /> : null}
+          {now_playing && trending ? (
+            <Content>
+              <NowPlayingLine>지금 상영중인 영화</NowPlayingLine>
+              <Slide top={0} data={now_playing}></Slide>
+              <TrendingLine>요즘 핫한 영화</TrendingLine>
+              <Slide top={300} data={trending} />
+            </Content>
+          ) : null}
           <AnimatePresence>
-            {bigMovieMatch ? (
+            {matchInfo ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
                   exit={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 />
-                <BigMoive layoutId={bigMovieMatch.params.id}>
-                  {clickedMovie && (
-                    <>
-                      <BigPhoto
-                        bgphoto={makeImagePath(
-                          clickedMovie.backdrop_path,
-                          "w500"
-                        )}
-                      ></BigPhoto>
-                      <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
-                    </>
-                  )}
-                </BigMoive>
+                {clickedMovie && matchInfo.params.top && (
+                  <BigMoive
+                    layoutId={
+                      clickedMovie.id + Number(matchInfo?.params.top) + ""
+                    }
+                  >
+                    {clickedMovie && (
+                      <>
+                        <BigPhoto
+                          bgphoto={makeImagePath(
+                            clickedMovie.backdrop_path,
+                            "w500"
+                          )}
+                        ></BigPhoto>
+                        <BigTitle>{clickedMovie.title}</BigTitle>
+                        <BigOverview>{clickedMovie.overview}</BigOverview>
+                      </>
+                    )}
+                  </BigMoive>
+                )}
               </>
             ) : null}
           </AnimatePresence>

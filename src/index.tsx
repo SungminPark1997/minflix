@@ -37,7 +37,7 @@ footer, header, hgroup, main, menu, nav, section {
     display: none;
 }
 body {
-  height: 200vh 
+  
   line-height: 1;
 }
 menu, ol, ul {
@@ -64,7 +64,7 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
   color:${(props) => props.theme.white.darker}
   line-height: 1.2;
-  background:linear-gradient(135deg,#e09,#d0e);
+
 }
 a {
   text-decoration:none;

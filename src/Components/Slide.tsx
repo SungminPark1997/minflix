@@ -1,18 +1,31 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { PathMatch, useMatch, useNavigate } from "react-router-dom";
+import {
+  PathMatch,
+  useLocation,
+  useMatch,
+  useNavigate,
+} from "react-router-dom";
 import { useState } from "react";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "framer-motion";
-import { IGetMoviesResult } from "../api";
+import { IGetMoviesResult, IGetTv } from "../api";
 import { makeImagePath } from "../utils";
 import React from "react";
 interface SliderProps {
   data: IGetMoviesResult; // data를 props로 받음
+  top: number;
 }
-const Slider = styled.div`
+interface TvProps {
+  data: IGetTv;
+  top: number;
+}
+//top: ${(props) => `calc(-100px + ${props.top}px`};
+const Slider = styled.div<{ top: number }>`
   position: relative;
-  top: -300px;
+  top: ${(props) => `calc(-300px + ${props.top}px)`};
+
+  margin-bottom: 150px;
 `;
 
 const Row = styled(motion.div)`
@@ -58,6 +71,7 @@ const LeftStyledIcon = styled(FontAwesomeIcon)`
   top: 80px;
   left: 25px;
   cursor: pointer;
+  box-shadow: 0 0 100px rgba(255, 255, 255, 0.5); /* 그림자 효과 */
 `;
 
 const RightStyledIcon = styled(FontAwesomeIcon)`
@@ -114,41 +128,50 @@ const infoVariants = {
   },
 };
 const offset = 6;
-function Slide({ data }: SliderProps) {
+function Slide({ data, top }: SliderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [direction, setDirection] = useState(1);
   const [index, setIndex] = useState(0);
-  const [condition, setCondition] = useState("left");
-  const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:id");
-  console.log(condition);
-  console.log(index);
+
   const arr = data?.results.slice(1).filter((movie) => movie.backdrop_path);
   const totalMovies = arr.length - 1;
-  console.log(totalMovies);
-  const [isFinish, setFinish] = useState(false);
 
-  const increaseIndex = (newDirection: number) => {
+  const [isFinish, setFinish] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+  const increaseIndex = () => {
     if (arr) {
-      if (isFinish) return;
-      setDirection(newDirection);
+      if (!isFinish) return;
+
       toggleLeaving();
 
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      let maxIndex = Math.floor(totalMovies / offset) - 1;
+      if (maxIndex < 0) {
+        maxIndex = 0;
+      }
 
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-      setCondition("right");
     }
   };
 
-  const decreaseIndex = (newDirection: number) => {
+  const decreaseIndex = () => {
     if (arr) {
-      if (isFinish) return;
-      setDirection(newDirection);
+      if (!isFinish) return;
+
       toggleLeaving();
 
       const maxIndex = Math.floor(totalMovies / offset) - 1;
+
       setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-      setCondition("left");
     }
   };
 
@@ -156,10 +179,21 @@ function Slide({ data }: SliderProps) {
     setFinish((prev) => !prev);
   };
   const onBoxClicked = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
+    if (location.pathname === "/") {
+      navigate(`/movies/${movieId}/${top + ""}`);
+    } else {
+      navigate(`${location.pathname}/${movieId}`, {
+        state: { defaultData: data },
+      });
+    }
   };
+  console.log(isFinish);
   return (
-    <Slider>
+    <Slider
+      top={top}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <AnimatePresence
         initial={false}
         onExitComplete={toggleLeaving}
@@ -177,11 +211,11 @@ function Slide({ data }: SliderProps) {
           {arr.slice(offset * index, offset * index + offset).map((movie) =>
             movie.backdrop_path ? (
               <Box
-                layoutId={movie.id + ""}
+                layoutId={movie.id + top + ""}
                 variants={boxVariants}
                 whileHover="hover"
                 initial="normal"
-                key={movie.id}
+                key={movie.id + ""}
                 onClick={() => onBoxClicked(movie.id)}
                 transition={{ type: "tween" }}
                 bgphoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -193,21 +227,27 @@ function Slide({ data }: SliderProps) {
             ) : null
           )}
         </Row>
-        <RightStyledIcon
-          key="right-icon"
-          icon={faArrowRight}
-          onClick={() => {
-            increaseIndex(1);
-          }}
-        />
-        <LeftStyledIcon
-          key="left-icon"
-          icon={faArrowLeft}
-          onClick={() => {
-            decreaseIndex(-1);
-          }}
-        />
       </AnimatePresence>
+      {isHovered ? (
+        <>
+          <RightStyledIcon
+            key="right-icon"
+            icon={faArrowRight}
+            onClick={() => {
+              increaseIndex();
+              setDirection(1);
+            }}
+          />
+          <LeftStyledIcon
+            key="left-icon"
+            icon={faArrowLeft}
+            onClick={() => {
+              decreaseIndex();
+              setDirection(-1);
+            }}
+          />
+        </>
+      ) : null}
     </Slider>
   );
 }
