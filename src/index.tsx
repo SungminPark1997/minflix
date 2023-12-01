@@ -5,6 +5,8 @@ import App from "./App";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { theme } from "./theme";
 import reportWebVitals from "./reportWebVitals";
+import { RouterProvider } from "react-router-dom";
+import router from "./Router";
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 html, body, div, span, applet, object, iframe,
@@ -80,7 +82,8 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <GlobalStyle /> <App />
+        <GlobalStyle />
+        <RouterProvider router={router} />
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>

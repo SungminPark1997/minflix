@@ -181,6 +181,8 @@ function Slide({ data, top }: SliderProps) {
   const onBoxClicked = (movieId: number) => {
     if (location.pathname === "/") {
       navigate(`/movies/${movieId}/${top + ""}`);
+    } else if (location.pathname === "/tv") {
+      navigate(`${location.pathname}/${movieId}/${top + ""}`);
     } else {
       navigate(`${location.pathname}/${movieId}`, {
         state: { defaultData: data },
@@ -221,7 +223,11 @@ function Slide({ data, top }: SliderProps) {
                 bgphoto={makeImagePath(movie.backdrop_path, "w500")}
               >
                 <Info variants={infoVariants}>
-                  <h4>{movie.title}</h4>
+                  <h4>
+                    {location.pathname === "/tv"
+                      ? movie.original_name
+                      : movie.title}
+                  </h4>
                 </Info>
               </Box>
             ) : null
