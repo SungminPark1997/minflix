@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+
 import { useQuery } from "react-query";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult, trendMovies } from "../api";
 import Slide from "../Components/Slide";
 import { makeImagePath } from "../utils";
+import Banner from "../Components/Banner";
 export const Wrapper = styled.div`
   background: rgb(8%, 8%, 8%);
   overflow-x: hidden;
@@ -17,27 +18,6 @@ export const Loader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-export const Banner = styled.div<{ bgphoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-
-  background-image: linear-gradient(rgba(8%, 8%, 8%, 0), rgba(8%, 8%, 8%, 1)),
-    url(${(props) => props.bgphoto});
-  background-size: cover;
-`;
-
-export const Title = styled.h2`
-  font-size: 50px;
-  width: 50%;
-  color: white;
-`;
-export const Overview = styled.p`
-  font-size: 36px;
 `;
 
 export const Content = styled.div`
@@ -94,7 +74,7 @@ export const NowPlayingLine = styled.div`
   position: absolute;
   top: -335px;
 
-  z-index: 1; /* Slide 컴포넌트의 아래에 위치하도록 z-index 설정 */
+  z-index: 1;
   color: white;
   font-size: 24px;
 `;
@@ -102,7 +82,7 @@ export const TrendingLine = styled.div`
   position: absolute;
   top: -35px;
 
-  z-index: 1; /* Slide 컴포넌트의 아래에 위치하도록 z-index 설정 */
+  z-index: 1;
   color: white;
   font-size: 24px;
 `;
@@ -135,20 +115,16 @@ function Home() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            bgphoto={makeImagePath(now_playing?.results[0].backdrop_path || "")}
-          >
-            <Title>{now_playing?.results[0].title}</Title>
-            <Overview>{now_playing?.results[0].overview}</Overview>
-          </Banner>
-
           {now_playing && trending ? (
-            <Content>
-              <NowPlayingLine>지금 상영중인 영화</NowPlayingLine>
-              <Slide top={0} data={now_playing}></Slide>
-              <TrendingLine>요즘 핫한 영화</TrendingLine>
-              <Slide top={300} data={trending} />
-            </Content>
+            <>
+              <Banner {...now_playing} />
+              <Content>
+                <NowPlayingLine>지금 상영중인 영화</NowPlayingLine>
+                <Slide top={0} data={now_playing}></Slide>
+                <TrendingLine>요즘 핫한 영화</TrendingLine>
+                <Slide top={300} data={trending} />
+              </Content>
+            </>
           ) : null}
           <AnimatePresence>
             {matchInfo ? (

@@ -5,7 +5,6 @@ import { getTv, IGetMoviesResult, IGetTv, ITv, popularTv } from "../api";
 import Slide from "../Components/Slide";
 import { makeImagePath } from "../utils";
 import {
-  Banner,
   BigMoive,
   BigOverview,
   BigPhoto,
@@ -14,11 +13,10 @@ import {
   Loader,
   NowPlayingLine,
   Overlay,
-  Overview,
-  Title,
   TrendingLine,
   Wrapper,
 } from "./Home";
+import Banner from "../Components/Banner";
 
 function Tv() {
   const navigate = useNavigate();
@@ -44,21 +42,16 @@ function Tv() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            bgphoto={makeImagePath(
-              tv_nowPlaying?.results[1].backdrop_path || ""
-            )}
-          >
-            <Title>{tv_nowPlaying?.results[1].original_name}</Title>
-            <Overview>{tv_nowPlaying?.results[1].overview}</Overview>
-          </Banner>
           {tv_nowPlaying && tv_popular ? (
-            <Content>
-              <NowPlayingLine>지금 상영중인 영화</NowPlayingLine>
-              <Slide top={0} data={tv_nowPlaying}></Slide>
-              <TrendingLine>요즘 잘나가는 시리즈</TrendingLine>
-              <Slide top={300} data={tv_popular} />
-            </Content>
+            <>
+              <Banner {...tv_nowPlaying} />
+              <Content>
+                <NowPlayingLine>지금 상영중인 드라마</NowPlayingLine>
+                <Slide top={0} data={tv_nowPlaying}></Slide>
+                <TrendingLine>요즘 잘나가는 시리즈</TrendingLine>
+                <Slide top={300} data={tv_popular} />
+              </Content>
+            </>
           ) : null}
           <AnimatePresence>
             {matchInfo ? (

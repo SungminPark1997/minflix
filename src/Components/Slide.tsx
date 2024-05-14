@@ -20,7 +20,7 @@ interface TvProps {
   data: IGetTv;
   top: number;
 }
-//top: ${(props) => `calc(-100px + ${props.top}px`};
+
 const Slider = styled.div<{ top: number }>`
   position: relative;
   top: ${(props) => `calc(-300px + ${props.top}px)`};
@@ -189,7 +189,7 @@ function Slide({ data, top }: SliderProps) {
       });
     }
   };
-  console.log(isFinish);
+
   return (
     <Slider
       top={top}

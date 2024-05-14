@@ -35,29 +35,30 @@ export interface IGetTv {
   total_pages: number;
   total_results: number;
 }
-export function getTv() {
-  return fetch(`${BASE_PATH}/tv/on_the_air?api_key=${API_KEY}`).then(
-    (respose) => respose.json()
-  );
+export async function getTv() {
+  const respose = await fetch(`${BASE_PATH}/tv/on_the_air?api_key=${API_KEY}`);
+  return await respose.json();
 }
-export function getMovies() {
-  return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
-    (response) => response.json()
+export async function getMovies() {
+  const response = await fetch(
+    `${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`
   );
+  return await response.json();
 }
-export function popularTv() {
-  return fetch(`${BASE_PATH}/tv/popular?api_key=${API_KEY}`).then((respose) =>
-    respose.json()
-  );
+export async function popularTv() {
+  const respose = await fetch(`${BASE_PATH}/tv/popular?api_key=${API_KEY}`);
+  return await respose.json();
 }
-export function searchMovies(value: String) {
-  return fetch(
+export async function searchMovies(value: String) {
+  const response = await fetch(
     `${BASE_PATH}/search/movie?query=${value}&api_key=${API_KEY}`
-  ).then((response) => response.json());
+  );
+  return await response.json();
 }
 
-export function trendMovies() {
-  return fetch(`${BASE_PATH}/trending/movie/day?api_key=${API_KEY}`).then(
-    (response) => response.json()
+export async function trendMovies() {
+  const response = await fetch(
+    `${BASE_PATH}/trending/movie/day?api_key=${API_KEY}`
   );
+  return await response.json();
 }

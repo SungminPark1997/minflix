@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-import App from "./App";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { theme } from "./theme";
 import reportWebVitals from "./reportWebVitals";
