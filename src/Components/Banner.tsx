@@ -15,8 +15,9 @@ export const Wrapper = styled.div<{ bgphoto: string }>`
   background-size: cover;
 `;
 const Cover = styled.div`
-  opactiy: 0.5;
-  background-color: pink;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
 `;
 export const Title = styled.h2`
   font-size: 50px;
@@ -26,6 +27,7 @@ export const Title = styled.h2`
 `;
 export const Overview = styled.p`
   font-size: 36px;
+  color: white;
 `;
 export default function Banner(now_playing: IGetMoviesResult) {
   const location = useLocation();
